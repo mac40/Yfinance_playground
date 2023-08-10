@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pandas import DataFrame
 from typing import Optional
-from os import listdir, path
+from os import path
 
 
 class Designer:
