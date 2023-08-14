@@ -1,2 +1,4 @@
 yfinance==0.2.27
 seaborn==0.12.2
+statsmodels==0.14.0
+pandas==2.0.3

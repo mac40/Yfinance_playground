@@ -1,8 +1,9 @@
 from lib import Orchestrator
 
 
-if __name__ == "__main__":
-    op = Orchestrator()
+def main(
+    orchestrator: Orchestrator,
+) -> None:
     user_input = ""
 
     while user_input.lower() not in ["exit", "stop", "quit", "break"]:
@@ -25,3 +26,13 @@ if __name__ == "__main__":
             op.plot_stock(user_input[5:], period=period)
         elif user_input not in ["exit", "stop", "quit", "break"]:
             print("Wrong Input")
+
+
+if __name__ == "__main__":
+    op = Orchestrator()
+
+    # main(orchestrator=op)
+    op.print_adfuller("^SPX")
+    op.plot_diff_data("^SPX")
+    # op.plot_stock("^SPX")
+    # op.plot_autocorrelation("^SPX")
