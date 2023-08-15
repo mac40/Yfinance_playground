@@ -3,6 +3,7 @@ from .Designer import Designer
 from .DataScientist import DataScientist
 from typing import Optional, Literal
 from pandas import DataFrame
+import matplotlib.pyplot as plt
 
 
 class Orchestrator:
@@ -48,25 +49,23 @@ class Orchestrator:
         self.__des.draw_plot(data=data, plot_type="plot", name=name)
         self.__des.save_plot(data=data, plot_type="plot", name=name)
 
-    def plot_autocorrelation(
-        self,
-        ticker: str,
-        max_lags: int = 20,
-        period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
-    ) -> None:
-        name = self.__dm.get_ticker_info(ticker=ticker)["shortName"]
-        data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
-        self.__des.draw_plot(data=data, plot_type="auto_correlation", name=name, max_lags=max_lags)
-
     def print_adfuller(
         self,
         ticker: str,
         period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
+        diff_level: Optional[int] = None,
     ) -> None:
         data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
-        self.__ds.print_adfuller(data=data)
+        if diff_level:
+            data = self.__ds.differenciate_data(data=data, diff_lvl=diff_level)
+        result = self.__ds.adfuller(data=data)
+        print('ADF Statistic: %f' % result[0])
+        print('p-value: %f' % result[1])
+        print('Critical Values:')
+        for key, value in result[4].items():
+            print('\t%s: %.3f' % (key, value))
 
-    def plot_diff_data(
+    def plot_diffs_stock(
         self,
         ticker: str,
         period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
@@ -78,3 +77,53 @@ class Orchestrator:
         for i in range(diff_levels):
             diffs.append(self.__ds.differenciate_data(data=data, diff_lvl=i + 1))
         self.__des.draw_plot(data=diffs, plot_type="multiseries_plot")
+
+    def plot_acf(
+        self,
+        ticker: str,
+        period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
+        diff_level: Optional[int] = None,
+    ) -> None:
+        name = self.__dm.get_ticker_info(ticker=ticker)["shortName"]
+        data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
+        if diff_level:
+            data = self.__ds.differenciate_data(data=data, diff_lvl=diff_level)
+        self.__des.draw_plot(data=data, plot_type="auto_correlation", name=name)
+
+    def plot_pacf(
+        self,
+        ticker: str,
+        period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
+        diff_level: Optional[int] = None,
+    ) -> None:
+        name = self.__dm.get_ticker_info(ticker=ticker)["shortName"]
+        data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
+        if diff_level:
+            data = self.__ds.differenciate_data(data=data, diff_lvl=diff_level)
+        self.__des.draw_plot(data=data, plot_type="partial_auto_correlation", name=name)
+
+    def test_model(
+        self,
+        ticker: str,
+        p: int,
+        q: int,
+        d: int,
+        period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
+    ) -> None:
+        data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
+        test, predictions = self.__ds.test_arima(data, p, q, d)
+        self.__des.draw_plot(plot_type="prediction", data=test, prediction=predictions)
+
+    def predict(
+        self,
+        ticker: str,
+        p: int,
+        q: int,
+        d: int,
+        period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
+        future: Literal[5, 10, 20, 30] = 10,
+    ) -> None:
+        data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
+        fitted, predictions = self.__ds.predict_arima(data=data, p=p, q=q, d=d, period=future)
+        forecast = [x for x in fitted] + [x for x in predictions]
+        self.__des.draw_plot(data=data.values[2:], plot_type="prediction", prediction=forecast[2:])

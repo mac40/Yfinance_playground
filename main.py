@@ -30,9 +30,14 @@ def main(
 
 if __name__ == "__main__":
     op = Orchestrator()
-
     # main(orchestrator=op)
-    op.print_adfuller("^SPX")
-    op.plot_diff_data("^SPX")
+
     # op.plot_stock("^SPX")
-    # op.plot_autocorrelation("^SPX")
+    # op.plot_diffs_stock("^SPX")
+    # op.print_adfuller("^SPX")
+    # op.print_adfuller("^SPX", diff_level=1)
+    # op.print_adfuller("^SPX", diff_level=2)
+    # op.plot_acf("^SPX", diff_level=2)
+    # op.plot_pacf("^SPX", diff_level=2)
+    # op.test_model("^SPX", 2, 2, 1, period="6mo")
+    op.predict("^SPX", 2, 2, 1, future=365, period='1y')

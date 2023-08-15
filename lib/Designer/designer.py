@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-from enum import Enum
+from statsmodels.graphics.tsaplots import (
+    plot_acf,
+    plot_pacf,
+)
 from pandas import (
     DataFrame,
     Series,
@@ -15,7 +18,9 @@ class Designer:
             "plot": self.__plot,
             "series_plot": self.__series_plot,
             "multiseries_plot": self.__multiseries_plot,
-            "auto_correlation": self.__plot_autocorrelation,
+            "auto_correlation": self.__plot_acf,
+            "partial_auto_correlation": self.__plot_pacf,
+            "prediction": self.__plot_prediction,
         }
         sns.set_theme(
             style="darkgrid",
@@ -71,14 +76,35 @@ class Designer:
         plt.legend()
         plt.grid(True, alpha=0.5)
 
-    def __plot_autocorrelation(
+    def __plot_acf(
         self,
-        name: str,
         data: Series,
-        max_lags: int = 10,
+        name: Optional[str] = None,
     ) -> None:
-        plt.acorr(data, maxlags=max_lags)
-        plt.grid(True)
+        fig, ax = plt.subplots(figsize=(15, 5))
+        if name:
+            plt.title(f"{name}")
+        plot_acf(data, ax=ax)
+
+    def __plot_pacf(
+        self,
+        data: Series,
+        name: Optional[str] = None,
+    ) -> None:
+        fig, ax = plt.subplots(figsize=(15, 5))
+        if name:
+            plt.title(f"{name}")
+        plot_pacf(data, ax=ax)
+
+    def __plot_prediction(
+        self,
+        data: Series,
+        prediction: Series,
+        name: Optional[str] = None,
+    ) -> None:
+        plt.plot(data, color="b")
+        plt.plot(prediction, color="r")
+
 
     def draw_plot(
         self,
