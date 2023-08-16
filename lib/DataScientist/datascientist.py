@@ -4,9 +4,7 @@ from statsmodels.tsa.arima.model import (
     ARIMAResults,
 )
 from pandas import Series
-from math import sqrt
 from typing import Literal
-from sklearn.metrics import mean_squared_error
 
 
 class DataScientist:

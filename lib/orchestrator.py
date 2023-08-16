@@ -3,7 +3,6 @@ from .Designer import Designer
 from .DataScientist import DataScientist
 from typing import Optional, Literal
 from pandas import DataFrame
-import matplotlib.pyplot as plt
 
 
 class Orchestrator:

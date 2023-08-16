@@ -105,7 +105,6 @@ class Designer:
         plt.plot(data, color="b")
         plt.plot(prediction, color="r")
 
-
     def draw_plot(
         self,
         data: DataFrame,
