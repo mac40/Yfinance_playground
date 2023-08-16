@@ -37,22 +37,13 @@ class DataScientist:
         d: int,
     ) -> (list, list):
         X = data.values
-        size = int(len(X) * 0.66)
+        size = int(len(X) - 30)
         train, test = X[0:size], X[size:len(X)]
-        history = [x for x in train]
-        predictions = list()
-        # walk-forward validation
-        for t in range(len(test)):
-            model = ARIMA(history, order=(p, q, d))
-            model_fit = model.fit()
-            output = model_fit.forecast()
-            yhat = output[0]
-            predictions.append(yhat)
-            obs = test[t]
-            history.append(obs)
-        rmse = sqrt(mean_squared_error(test, predictions))
-        print('Test RMSE: %.3f' % rmse)
-        return test, predictions
+        model = ARIMA(train, order=(p, q, d))
+        model_fit: ARIMAResults = model.fit()
+        fitted = model_fit.fittedvalues
+        predictions = model_fit.forecast(steps=len(test))
+        return fitted, predictions
 
     def predict_arima(
         self,

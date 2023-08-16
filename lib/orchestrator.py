@@ -111,10 +111,11 @@ class Orchestrator:
         period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
     ) -> None:
         data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
-        test, predictions = self.__ds.test_arima(data, p, q, d)
-        self.__des.draw_plot(plot_type="prediction", data=test, prediction=predictions)
+        fitted, predictions = self.__ds.test_arima(data, p, q, d)
+        forecast = [x for x in fitted[2:]] + [x for x in predictions]
+        self.__des.draw_plot(data=data.values[2:], plot_type="prediction", prediction=forecast[2:])
 
-    def predict(
+    def plot_prediction(
         self,
         ticker: str,
         p: int,
@@ -125,5 +126,5 @@ class Orchestrator:
     ) -> None:
         data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
         fitted, predictions = self.__ds.predict_arima(data=data, p=p, q=q, d=d, period=future)
-        forecast = [x for x in fitted] + [x for x in predictions]
+        forecast = [x for x in fitted[2:]] + [x for x in predictions]
         self.__des.draw_plot(data=data.values[2:], plot_type="prediction", prediction=forecast[2:])
