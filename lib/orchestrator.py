@@ -101,16 +101,34 @@ class Orchestrator:
             data = self.__ds.differenciate_data(data=data, diff_lvl=diff_level)
         self.__des.draw_plot(data=data, plot_type="partial_auto_correlation", name=name)
 
+    def evaluate_hyperparameters(
+        self,
+        ticker: str,
+        p_values: list = [0, 1, 2, 4, 6, 8, 10],
+        d_values: range = range(0, 3),
+        q_values: range = range(0, 3),
+        period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
+    ) -> None:
+        data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
+        best_cfg, best_score = self.__ds.evaluate_hyperparameters(
+            data,
+            p_values,
+            d_values,
+            q_values,
+        )
+        print(best_cfg, best_score)
+
     def test_model(
         self,
         ticker: str,
         p: int,
         q: int,
         d: int,
+        test_size: int = 30,
         period: Optional[Literal["1mo", "3mo", "6mo", "1y"]] = "3mo",
     ) -> None:
         data = self.__dm.get_ticker_history(ticker=ticker, period=period)["Close"]
-        fitted, predictions = self.__ds.test_arima(data, p, q, d)
+        fitted, predictions = self.__ds.test_arima(data, p, q, d, test_size)
         forecast = [x for x in fitted[2:]] + [x for x in predictions]
         self.__des.draw_plot(data=data.values[2:], plot_type="prediction", prediction=forecast[2:])
 
